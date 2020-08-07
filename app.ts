@@ -1,34 +1,29 @@
-function add(n1:number, n2:number, showResult: boolean, phrase: string) {
-  if (showResult) {
-    console.log(phrase + (n1 + n2))    
+type NumStr = number | string;
+type Convert = 'as-number' | 'as-text'
+
+function combine(
+  input1: NumStr,
+  input2: NumStr,
+  resultType: Convert){
+  let result;
+  if (typeof input1 === 'number' && typeof input2 === 'number' || resultType === 'as-number'){
+    result = +input1 + +input2;
   }
-  return n1 + n2;
+    result = input1.toString() + input2.toString()
+  if (resultType === 'as-number') {
+    return +(result)
+  } else {
+    return result.toString
+  }
 };
 
-let number0: number; number0 = 20;
-let number00; number00 = '20';
-const number1 = 5;
-const number2 = 2.8;
-const printResult = true;
-const resultPhrase = 'Result is: '
+type Product = { title: string; price: number; };
+const p1: Product = { title: 'Abook', price: 12.99 }
 
-add(number1, number2, printResult, resultPhrase);
+type User = { name: string } | string;
+let u1: User = { name: 'Max' };
+u1 = 'Michael'
 
-
-
-
-
-
-
-// const button = document.querySelector("button");
-// const input1 = document.getElementById("num1")! as HTMLInputElement;//type castaing
-// const input2 = document.getElementById("num1")! as HTMLInputElement;
-// /*! means will always find an element*/
-
-// function add(num1: number, num2: number) {
-//   return num1 + num2;
-// };
-
-// button.addEventListener("click", function () {
-//   console.log(add(+input1.value, +input2.value)); //+ converts to number
-// })
+const combinedStringAges = combine('30', '26', 'as-number');
+const combinedAges = combine(30, 26, "as-number");
+const combinedNames = combine('Max', 'Anna', "as-text");
