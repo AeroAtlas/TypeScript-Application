@@ -1,110 +1,122 @@
-const userName = 'Bob';
-console.log(userName);
-////const button = document.querySelector('button')!;
+abstract class Department{
+  // private readonly id: string;
+  // private name: string;
+  public static fiscalYear = 2020; //can also just be static fiscalYear = 2020
+  private readonly work: string = 'DEFAULT';//can only be accessed through its class methods
+  protected employees: string[] = [];//like private, but available for inheritence
 
-function subtract(n1: number, n2: number): number | void {
-  if (n1 - n2 > 0) {
-    return n1 - n2
+  //Constructor
+  constructor(protected readonly id: string, public name: string) {
+    // this.name = n;
+    // this.id = id;
+    //console.log(this.fiscalYear) //this will not work be this is instance not static
+    console.log(Department.fiscalYear) //this will work though
   }
-  return;
+  //Methods
+  static createEmployee(name: string) {
+    return {name: name}
+  }
+  //Abstract methods required by all inheritents 
+  abstract describe(this: Department): void;
+
+  addEmployee(employee: string){
+    this.employees.push(employee)
+  }
+  printEmployeeInfo(this: Department) {
+    console.log(this.employees.length)
+    console.log(this.employees)
+    console.log(this.work)
+  }
+}
+//Inheritance
+class ITDepartment extends Department {
+  public admins: string[];
+  constructor(id: string, admins: string[]) {
+    super(id, 'IT'); //calls base constructor
+    this.admins = admins;
+
+  }
+  describe() {
+    console.log('IT Department - ID: ' + this.id)
+  }
 }
 
-const person = {
-  firstName: 'Max',
-  age: 30
-};
+class AccountingDepartment extends Department {
+  private lastReport: string;
 
-const notCopiedPerson = person //copies the pointer to the person object (middleman)
-const copiedPerson = { ...person }; // creates new object identical to person
+  //Getter lets you access otherwise private values
+  get recentReport() {
+    if (this.lastReport) {
+      return this.lastReport;
+    } //has to return something
+    throw new Error('No report found');
+  }
 
+  //Setter
+  set recentReport(value: string) {
+    if (!value) {
+      throw new Error('Please pass in a value')
+    }
+    this.addReport(value);
+  }
 
-const add = (...numbers: number[]) => {
-  return numbers.reduce((curRes, curVal) => {
-    return curRes + curVal
-  }, 0)
+  constructor(id: string, private reports: string[]) {
+    super(id, 'IT');
+    this.lastReport = reports[0];
+  }
+
+  describe() {
+    console.log('Accounting Department - ID: ' + this.id)
+  }
+  addEmployee(name: string) {//overwrites Department addEmployee when using accountingdepo
+    if (name === 'Max') {
+      return;
+    } else {
+      this.employees.push(name)
+    }
+  }
+  addReport(text: string) {
+    this.reports.push(text)
+    this.lastReport = text;
+  }
+  printReports(this:AccountingDepartment) {
+    console.log(this.reports);
+  }
 }
 
-const hobbies = ['Sports', 'Cooking', 'eating', 'beating'];
+const employee1 = Department.createEmployee('Maxman');
+console.log(employee1, Department.fiscalYear)
 
-const addedNumber = add(5, 4, 3, 2, 1);
-console.log(addedNumber);
+// const accounting = new Department('D15G', 'Accounting');
+const it = new ITDepartment('d1', ['Max']);
 
-const [hobby1, hobby2, ...remainingHobbies] = hobbies;
+//math
+let number = Math.ceil(Math.pow(5,2))
 
-const { firstName: theName, age } = person;
-// the variable must be an existing name but can rename with :
+it.addEmployee('Max');
+it.addEmployee('Bob');
+//accounting.employees[2] = 'Anna' // won't work with private
 
-// const add = (a: number, b: number) => a + b //default arg
-// const sub = (a: number, b: number = 1) => a - b //default arg
+it.describe();
+console.log(it)
 
+const accounting = new AccountingDepartment('d2', []);
 
-// const activeHobbies = ['Hiking', ...hobbies];
-
-// activeHobbies.push(...hobbies)
-
-// const clickHandler = (message: string) => console.log('Clicked! ' + message);
-
-// const printOutput: (a: number | string) => void = output => console.log(output);
-
-// printOutput(sub(5))
-
-
-// const button = document.querySelector('button');
-// if (button) {
-//   button.addEventListener('click', event => console.log(event))
-// }
-
-
-// if (button) {
-//   button.addEventListener('click', clickHandler.bind(null, 'You\'re welcome'))
-// }
+accounting.recentReport = "Something went right!";
+accounting.addReport('Something went wrong');
+console.log(accounting.recentReport);
 
 
 
+accounting.addEmployee('Max');
+accounting.addEmployee('Bobetta')
 
-// let userInput: unknown;
-// let userName: string | number;
+// accounting.printReports();
+// accounting.printEmployeeInfo();
+accounting.describe();
 
 
-// userInput = 5;
-// userInput = "bob";
-// if (typeof userInput === 'string') {
-//   userName = userInput;
-// }
+// const accountingCopy = { name: 'Dummy', job: accounting.job, employees: [], describe: accounting.describe }
+// console.log(accountingCopy);
+// accountingCopy.describe();
 
-// // function generateError(message: string, code: number): never {
-// //   throw { message: message, errorCode: code };
-// //   //while(true) {} 
-// // }
-
-// // generateError('An error occured!', 500)
-
-// type NumStr = number | string;
-// type Convert = 'as-number' | 'as-text'
-
-// function combine(
-//   input1: NumStr,
-//   input2: NumStr,
-//   resultType: Convert){
-//   let result;
-//   if (typeof input1 === 'number' && typeof input2 === 'number' || resultType === 'as-number'){
-//     result = +input1 + +input2;
-//   }
-//     result = input1.toString() + input2.toString()
-//   if (resultType === 'as-number') {
-//     return +(result)
-//   } else {
-//     return result.toString
-//   }
-// };
-
-// type Product = { title: string; price: number; };
-// const p1: Product = { title: 'Abook', price: 12.99 }
-
-// type User = { name: string } | string;
-// let u1: User = { name: 'Max' };
-// u1 = 'Michael'
-
-// const combinedStringAges = combine('30', '26', 'as-number');
-// const combinedAges = combine(30, 26, "as-number");
-// const combinedNames = combine('Max', 'Anna', "as-text");
