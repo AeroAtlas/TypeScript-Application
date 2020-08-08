@@ -1,122 +1,61 @@
-abstract class Department{
-  // private readonly id: string;
-  // private name: string;
-  public static fiscalYear = 2020; //can also just be static fiscalYear = 2020
-  private readonly work: string = 'DEFAULT';//can only be accessed through its class methods
-  protected employees: string[] = [];//like private, but available for inheritence
-
-  //Constructor
-  constructor(protected readonly id: string, public name: string) {
-    // this.name = n;
-    // this.id = id;
-    //console.log(this.fiscalYear) //this will not work be this is instance not static
-    console.log(Department.fiscalYear) //this will work though
-  }
-  //Methods
-  static createEmployee(name: string) {
-    return {name: name}
-  }
-  //Abstract methods required by all inheritents 
-  abstract describe(this: Department): void;
-
-  addEmployee(employee: string){
-    this.employees.push(employee)
-  }
-  printEmployeeInfo(this: Department) {
-    console.log(this.employees.length)
-    console.log(this.employees)
-    console.log(this.work)
-  }
+//Custom Type
+type AddFnType = (a: number, b: number) => number;
+//Interface 
+interface AddFn {
+  //anonymous function
+  (a: number, b: number): number;
 }
-//Inheritance
-class ITDepartment extends Department {
-  public admins: string[];
-  constructor(id: string, admins: string[]) {
-    super(id, 'IT'); //calls base constructor
-    this.admins = admins;
-
-  }
-  describe() {
-    console.log('IT Department - ID: ' + this.id)
-  }
+let add: AddFn;
+add = (n1:number, n2:number) => {return n1+n2}
+//Interfaces
+interface Named {
+  readonly name: string;
+  outputName?: string; //optional property
+}
+interface Greetable extends Named {
+  greet(phrase: string): void;
+  goodbye?(phrase: string): void;
+}
+interface Age {
+  age: number;
 }
 
-class AccountingDepartment extends Department {
-  private lastReport: string;
+//can implement multiple interfaces using comma
+class Person implements Greetable, Age {
+  name: string;
+  outputName?: string;
+  age: number;
 
-  //Getter lets you access otherwise private values
-  get recentReport() {
-    if (this.lastReport) {
-      return this.lastReport;
-    } //has to return something
-    throw new Error('No report found');
-  }
-
-  //Setter
-  set recentReport(value: string) {
-    if (!value) {
-      throw new Error('Please pass in a value')
+  constructor(n: string, a: number, o?:string) {
+    if(o){
+      this.outputName = o; 
     }
-    this.addReport(value);
+    this.age = a;
+    this.name = n;
   }
 
-  constructor(id: string, private reports: string[]) {
-    super(id, 'IT');
-    this.lastReport = reports[0];
-  }
-
-  describe() {
-    console.log('Accounting Department - ID: ' + this.id)
-  }
-  addEmployee(name: string) {//overwrites Department addEmployee when using accountingdepo
-    if (name === 'Max') {
-      return;
-    } else {
-      this.employees.push(name)
+  greet(phrase: string) {
+    if (this.outputName) {
+      console.log(`${phrase} ${this.outputName} ${this.age} ${this.name}`)
     }
+    console.log(phrase + ' ' +this.age+ this.name)
   }
-  addReport(text: string) {
-    this.reports.push(text)
-    this.lastReport = text;
-  }
-  printReports(this:AccountingDepartment) {
-    console.log(this.reports);
-  }
+
+  
 }
 
-const employee1 = Department.createEmployee('Maxman');
-console.log(employee1, Department.fiscalYear)
+//Custom type (can use union types)
+type Person2 = {
+  readonly name: string;
+  age: number;
 
-// const accounting = new Department('D15G', 'Accounting');
-const it = new ITDepartment('d1', ['Max']);
+  greet(phrase: string): void;
+}
 
-//math
-let number = Math.ceil(Math.pow(5,2))
+let user1: Greetable;
 
-it.addEmployee('Max');
-it.addEmployee('Bob');
-//accounting.employees[2] = 'Anna' // won't work with private
+user1 = new Person('Bob', 22)
 
-it.describe();
-console.log(it)
+user1.greet('Hi there - I am');
 
-const accounting = new AccountingDepartment('d2', []);
-
-accounting.recentReport = "Something went right!";
-accounting.addReport('Something went wrong');
-console.log(accounting.recentReport);
-
-
-
-accounting.addEmployee('Max');
-accounting.addEmployee('Bobetta')
-
-// accounting.printReports();
-// accounting.printEmployeeInfo();
-accounting.describe();
-
-
-// const accountingCopy = { name: 'Dummy', job: accounting.job, employees: [], describe: accounting.describe }
-// console.log(accountingCopy);
-// accountingCopy.describe();
-
+//optional! => myMethod?(){...}

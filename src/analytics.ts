@@ -16,7 +16,7 @@ const notCopiedPerson = person //copies the pointer to the person object (middle
 const copiedPerson = { ...person }; // creates new object identical to person
 
 
-const add = (...numbers: number[]) => {
+const NowAdd = (...numbers: number[]) => {
   return numbers.reduce((curRes, curVal) => {
     return curRes + curVal
   }, 0)
@@ -24,7 +24,7 @@ const add = (...numbers: number[]) => {
 
 const hobbies = ['Sports', 'Cooking', 'eating', 'beating'];
 
-const addedNumber = add(5, 4, 3, 2, 1);
+const addedNumber = NowAdd(5, 4, 3, 2, 1);
 
 const [hobby1, hobby2, ...remainingHobbies] = hobbies;
 
