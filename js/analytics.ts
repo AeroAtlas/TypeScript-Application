@@ -29,3 +29,9 @@ const addedNumber = NowAdd(5, 4, 3, 2, 1);
 const [hobby1, hobby2, ...remainingHobbies] = hobbies;
 
 const { firstName: theName, age } = person;
+
+const thenAdd = ([...numbers]: number[]) =>{
+  return numbers.reduce((current, total) => {
+    return current + total;
+  })
+}
