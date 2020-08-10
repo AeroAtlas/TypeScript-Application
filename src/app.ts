@@ -4,6 +4,7 @@ function autobind(_target: any, _methodName: string, descriptor: PropertyDescrip
   const adjDescriptor: PropertyDescriptor = {
     configurable: true,
     get() {
+      //Binds this to all incoming methods
       const boundFn = originalMethod.bind(this)
       return boundFn;
     }
@@ -20,6 +21,7 @@ class ProjectInput {
   titleInputEl: HTMLInputElement; //HTMLElement
   descInputEl: HTMLInputElement; //HTMLElement
   peopleInputEl: HTMLInputElement; //HTMLElement
+  errorNum: number = 0;
 
   constructor() {
     //Get the element for the template and tag we will be hosting our data on
@@ -40,11 +42,54 @@ class ProjectInput {
     this.attach();
   }
 
+  //Get all user input and return a union type of either tuple or void
+  private getUserInput(): [string,string,number] | void {
+    const getTitle = this.titleInputEl.value
+    const getDesc = this.descInputEl.value
+    const getPeople = this.peopleInputEl.value
+
+    //Reset the error output
+    var x = document.querySelectorAll('#error-output');
+    for(var i in x){
+        x[i].parentNode?.removeChild( x[i] );
+    }
+    //If any of the length are 0
+    if (!getTitle.trim().length || !getDesc.trim().length || !getPeople.trim().length) {
+      //Increment the error number 
+      this.errorNum++;
+      //Create error-ouput and child text node and append to error-handle
+      const grand = document.getElementById('error-handle');
+      const para = document.createElement('p')
+      para.setAttribute('id', 'error-output')
+      const node = document.createTextNode(`Invalid input for one or more fields ${[this.errorNum]}`);
+      para?.appendChild(node)
+      grand?.appendChild(para)
+      return;
+      //throw new Error('Invalid input for one or more fields')
+    } else {
+      return [getTitle,getDesc, +getPeople]
+    }
+  }
+
+  //Clear the inputfields
+  private clearInputs() {
+    this.titleInputEl.value = '';
+    this.descInputEl.value = '';
+    this.peopleInputEl.value = '';
+  }
+
   //Handles the submit and is later bound using configure
   @autobind //adds autobind decorator
   private submitHandler(event: Event) {
     event.preventDefault();
-    console.log(this.titleInputEl.value)
+    const userInput = this.getUserInput();
+    //Check if its a tuple(js array) or void
+    if (Array.isArray(userInput)){
+      //deconstruct the tuple
+      const [title, desc, people] = userInput; 
+      console.log(title, desc, people);
+      this.clearInputs();
+    }
   }
 
   //Add listener to our form and binds it to our submithandler
