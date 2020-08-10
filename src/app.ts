@@ -1,3 +1,63 @@
+//Project Type
+enum ProjectStatus { Active, Finished };
+
+class Project {
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
+//State Management
+type Listener = (items: Project[]) => void;
+
+class ProjectState {
+  private listeners: Listener[]= [];
+  private projects: Project[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {
+    
+  }
+
+  //Turn this class into a singleton
+  static getInstance() {
+    if (this.instance) {
+      return this.instance
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  //Add listener functions to array
+  addListener(listenerFn: Listener) {
+    this.listeners.push(listenerFn);
+  }
+
+  //Add project object to the projects list
+  addProject(title:string, desc: string, people: number) {
+    const newProject = new Project(
+      Math.random().toString(),
+      title,
+      desc,
+      people,
+      ProjectStatus.Active
+    );
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      //make new reference for each listener (slice())
+      listenerFn(this.projects.slice()); 
+    }
+  }
+}
+
+//Global State
+const projectState = ProjectState.getInstance();
+
+
 //Validation
 interface Validator {
   value: string | number;
@@ -50,22 +110,39 @@ class ProjectList {
   templateEl: HTMLTemplateElement;
   hostEl: HTMLDivElement;
   element: HTMLElement;
+  assignedProj: Project[];
   constructor(private type: 'active' | 'finished') { //literal union type
     //Get the element for the output and our host
     this.templateEl = <HTMLTemplateElement>document.getElementById('project-list')!;
     this.hostEl = <HTMLDivElement>document.getElementById('app')!;
+    this.assignedProj = [];
 
     //Get the content of the template and add the user input id to it
     const importedNode = document.importNode(this.templateEl.content, true);
     this.element = <HTMLElement>importedNode.firstElementChild;
     this.element.id = `${this.type}-projects`;
 
+    //Add listener to the global state
+    projectState.addListener((projects: Project[]) => {
+      this.assignedProj = projects
+      this.renderProj();
+    });
+
     //Run methods
     this.attach();
-    this.render();
+    this.renderList();
   }
 
-  private render() {
+  private renderProj() {
+    const listEl = <HTMLUListElement>document.getElementById(`${this.type}-projects-list`)!;
+    this.assignedProj.map(prjItem => {
+      const listItem = document.createElement('li')
+      listItem.textContent = prjItem.title;
+      listEl.appendChild(listItem)
+    })
+  }
+
+  private renderList() {
     //Create Id to dynamically append to the unordered list and add Title to h2
     const listId = `${this.type}-projects-list`
     this.element.querySelector('ul')!.id = listId;
@@ -76,7 +153,6 @@ class ProjectList {
   private attach() {
     this.hostEl.insertAdjacentElement('beforeend', this.element);
   }
-
 
 }
 
@@ -172,9 +248,11 @@ class ProjectInput {
     const userInput = this.getUserInput();
     //Check if its a tuple(js array) or void
     if (Array.isArray(userInput)){
-      //deconstruct the tuple
+      //Deconstruct the tuple
       const [title, desc, people] = userInput; 
-      console.log(title, desc, people);
+      //Add the project to the global state
+      projectState.addProject(title, desc, people);
+      //Clear form inputs
       this.clearInputs();
     }
   }
