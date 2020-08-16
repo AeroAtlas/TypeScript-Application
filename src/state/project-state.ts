@@ -1,8 +1,8 @@
 namespace App { 
   //State Management
-  export type Listener<T> = (items: T[]) => void;
+  type Listener<T> = (items: T[]) => void;
 
-  export class State<T> {
+  class State<T> {
     protected listeners: Listener<T>[] = [];
 
     //Add listener functions to array
@@ -59,4 +59,8 @@ namespace App {
       }
     }
   }
+
+  //Global State
+  export const projectState = ProjectState.getInstance();
+
 }
