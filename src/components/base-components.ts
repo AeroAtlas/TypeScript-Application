@@ -1,4 +1,3 @@
-
 //Parent Class Component
 export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   templateEl: HTMLTemplateElement;
